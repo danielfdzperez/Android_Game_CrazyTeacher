@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 /**
- * Created by pc02 on 19/01/15.
+ * Created by danielfdzperez on 19/01/15.
  */
 
 public class Tile{
