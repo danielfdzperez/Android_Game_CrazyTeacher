@@ -61,4 +61,8 @@ public class Sprite {
     public int getCurrent_animation() {
         return current_animation;
     }
+
+    public void setCurrent_animation(int current_animation) {
+        this.current_animation = current_animation;
+    }
 }

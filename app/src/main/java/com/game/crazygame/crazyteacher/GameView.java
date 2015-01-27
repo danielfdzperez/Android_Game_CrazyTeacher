@@ -10,10 +10,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+
+import static java.lang.Thread.sleep;
 
 /*TODO Cambiar las variables height y width para que funcione bien sin repetir tanto codigo*/
 public class GameView extends SurfaceView {
@@ -28,8 +31,10 @@ public class GameView extends SurfaceView {
     private int width;
     private boolean big_screen_Y;
     private boolean big_screen_X;
+    private int edit_width;
+    private int edit_height;
     private static int touch_pos;//Guarda la posicion y de la pulsacion anterior
-    private static boolean move_touch;//Esta haciendo un scroll
+    private static boolean move_touch = false;//Esta haciendo un scroll
     private boolean touch = false;//TODO inicializar en su sitio
     private Arrow[] arrows;
 
@@ -40,6 +45,7 @@ public class GameView extends SurfaceView {
 
 
     public GameView(Context context) {
+
 
         super(context);
 
@@ -57,24 +63,25 @@ public class GameView extends SurfaceView {
                 boolean retry = true;
 
                 gameLoopThread.setRunning(false);
-
+                gameLoopThread.interrupted();
                 while (retry) {
                     try {
                         gameLoopThread.join();
                         retry = false;
                     } catch (InterruptedException e) {}
-
                 }
             }
 
             @Override
-
             public void surfaceCreated(SurfaceHolder holder) {
                 height = getHeight()/ROWS;
                 width =  getWidth()/COLS;
+                edit_height = height;
+                edit_width = width;
                 loadMap();
                 loadPlayer();
                 loadArrows();
+
                 gameLoopThread.setRunning(true);
                 gameLoopThread.start();
             }
@@ -83,9 +90,7 @@ public class GameView extends SurfaceView {
 
             @Override
 
-            public void surfaceChanged(SurfaceHolder holder, int format,
-
-                                       int width, int height) {
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
             }
 
@@ -99,8 +104,12 @@ public class GameView extends SurfaceView {
         Bitmap img_table  = BitmapFactory.decodeResource(getResources(), R.drawable.table);
         Tile ground = new Tile(img_ground, false);
         Tile table = new Tile(img_table, false);
-        if((img_ground.getWidth()) < width)
+
+        //TODO Cambiar esto
+        if((img_ground.getWidth()) < width) {
             big_screen_X = true;
+            edit_width -= 6;
+        }
         else
             big_screen_X = false;
 
@@ -113,20 +122,20 @@ public class GameView extends SurfaceView {
     }
 
     private void loadPlayer(){
-        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.bad1);
+        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.bad2);
 
 
         //TODO Cambiar esto
-        if((player_img.getHeight()/4) < height)
+        if((player_img.getHeight()/4) < height) {
             big_screen_Y = true;
+            edit_height -= 6;
+        }
         else
             big_screen_Y = false;
 
-
-
         int img_width = (player_img.getWidth()/3) < width ? width : (player_img.getWidth()/3);
         int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
-        int player_row = (player_img.getHeight()/4) > height ? ((ROWS-2)*(height)) :  ((ROWS-2)*(height-6));
+        int player_row = (player_img.getHeight()/4) > height ? ((ROWS-2)*edit_height) :  ((ROWS-2)*edit_height);
         int player_col = 10;
         player = new Player(player_col, player_row, img_width, img_height, player_img, (player_img.getWidth()/3), (player_img.getHeight()/4), 2, 3, 0, 0);
     }
@@ -142,6 +151,7 @@ public class GameView extends SurfaceView {
     public void updateObjects(){
         player.update();
         if(!move_touch && touch) {
+           // Log.d("ENTRO", "Entrado en el if de arrastrar");
             player.stop();
             touch = false;
         }
@@ -159,15 +169,6 @@ public class GameView extends SurfaceView {
             for(int x=0; x<COLS; x++) {
                 this.map[y][x].onDraw(canvas, x, y, width, height);
 
-                //Cambiar
-                int edit_height = height;
-                if(big_screen_Y) {
-                    edit_height -= 6;
-                }
-                int edit_width = width;
-                if(big_screen_X)
-                    edit_width -= 6;
-
                 if( (((int)((player.getPosition().getY()+player.getSprite().getHeight())/edit_height)) == y) && ((int)((player.getPosition().getX()+player.getSprite().getWidth())/(edit_width)) == x)) {
                     player.getSprite().nextAnimation();
                     player.onDraw(canvas);
@@ -176,7 +177,6 @@ public class GameView extends SurfaceView {
         for(int x = 0; x<arrows.length; x++){
             arrows[x].onDraw(canvas);
         }
-        //player.onDraw(canvas);
     }
 
 //    private boolean bigScreenY(Bitmap bmp){
@@ -184,33 +184,9 @@ public class GameView extends SurfaceView {
 //    private boolean bigScreenX(Bitmap bmp){
 //    }
 
+
     //@Override
     public boolean onTouchEvent(MotionEvent event) {
-
-//        if (System.currentTimeMillis() - lastClick > 500) {
-//
-//            lastClick = System.currentTimeMillis();
-//
-//            synchronized (getHolder()) {
-//
-//                for (int i = sprites.size() - 1; i >= 0; i--) {
-//
-//                    Sprite sprite = sprites.get(i);
-//
-//                    if (sprite.isCollition(event.getX(), event.getY())) {
-//
-//                        sprites.remove(sprite);
-//
-//                        break;
-//
-//                    }
-//
-//                }
-//
-//            }
-//
-//        }
-
 
         if(event.getAction() == MotionEvent.ACTION_MOVE)
             move_touch = true;
@@ -218,24 +194,25 @@ public class GameView extends SurfaceView {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             touch_pos = (int) event.getY();
             if (arrows[0].getDetector().contains((int)event.getX(), (int)event.getY())) {
-                player.moveLeft();
+                if (player.canMove(0, 0, Player.TDirection.WEST))
+                    player.moveLeft();
             }
             if (arrows[1].getDetector().contains((int)event.getX(), (int)event.getY()))
-                player.moveRight();
+                if(player.canMove((getWidth()-edit_width), 0, Player.TDirection.EAST))
+                   player.moveRight();
         }
         if(event.getAction() == MotionEvent.ACTION_UP) {
             if (move_touch) {
                 int distance = (touch_pos-event.getY()) < 0 ? (int)(touch_pos-event.getY())*-1 : (int)(touch_pos-event.getY());
                 if(distance > 100) {
-                    int edit_height = height;
-                    if(big_screen_Y) {
-                        edit_height -= 6;
-                    }
                     if (touch_pos > (int) event.getY()) {
-                        player.moveUp((edit_height * 2));
+                        if((player.getPosition().getY() - (edit_height * 2)) > edit_height * 2)
+                           player.moveUp((edit_height * 2));
                     }
-                    else
-                        player.moveDown((edit_height* 2));
+                    else {
+                        if ((player.getPosition().getY() + (edit_height * 2)) < (getHeight()-edit_height))
+                            player.moveDown((edit_height * 2));
+                    }
                 }
                 else
                     player.stop();
