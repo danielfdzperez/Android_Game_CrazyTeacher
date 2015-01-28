@@ -1,6 +1,7 @@
 package com.game.crazygame.crazyteacher;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
 
 public class GameLoopThread extends Thread {
@@ -24,6 +25,7 @@ public class GameLoopThread extends Thread {
     public void setRunning(boolean run) {
         running = run;
     }
+    public boolean isRunning() { return running; }
 
 
 
@@ -38,6 +40,11 @@ public class GameLoopThread extends Thread {
         long sleepTime;
 
         while (running) {
+//            if(isInterrupted()) {
+//                Log.d("INTERUMPIDO", "");
+//                running = false;
+//                return;
+//            }
 
             Canvas c = null;
 
