@@ -36,6 +36,7 @@ public class GameView extends SurfaceView {
     private static int touch_pos;//Guarda la posicion y de la pulsacion anterior
     private static boolean move_touch = false;//Esta haciendo un scroll
     private boolean touch = false;//TODO inicializar en su sitio
+    private boolean touching = false;//TODO inicializar en su sitio
     private Arrow[] arrows;
 
     private Player player;
@@ -183,42 +184,50 @@ public class GameView extends SurfaceView {
     //@Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if(event.getAction() == MotionEvent.ACTION_MOVE)
-            move_touch = true;
+        if (!touching) {
 
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            touch_pos = (int) event.getY();
-            if (arrows[0].getDetector().contains((int)event.getX(), (int)event.getY())) {
-                if (player.canMove(Player.TDirection.WEST));
-                    player.moveLeft();
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                move_touch = true;
+                touching = true;
             }
-            if (arrows[1].getDetector().contains((int)event.getX(), (int)event.getY())) {
-                if (player.canMove(Player.TDirection.EAST))
-                    player.moveRight();
-            }
-        }
-        if(event.getAction() == MotionEvent.ACTION_UP) {
-            if (move_touch) {
-                int distance = (touch_pos-event.getY()) < 0 ? (int)(touch_pos-event.getY())*-1 : (int)(touch_pos-event.getY());
-                if(distance > 100) {
-                    if (touch_pos > (int) event.getY()) {
-                        if(player.canMove(Player.TDirection.NORTH))
-                           player.moveUp();
-                    }
-                    else {
-                        if (player.canMove(Player.TDirection.SOUTH))
-                            player.moveDown();
+
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                Log.d("Pulsado", "pulsado");
+                touch_pos = (int) event.getY();
+                if (arrows[0].getDetector().contains((int) event.getX(), (int) event.getY())) {
+                    if (player.canMove(Player.TDirection.WEST)) {
+                        player.moveLeft();
+                        touching = true;
                     }
                 }
-                else
-                    player.stop();
-                move_touch = false;
-                touch = true;
+                if (arrows[1].getDetector().contains((int) event.getX(), (int) event.getY())) {
+                    if (player.canMove(Player.TDirection.EAST)) {
+                        player.moveRight();
+                        touching = true;
+                    }
+                }
             }
-            else
-               player.stop();
         }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                Log.d("Soltado", "spoltado");
+                if (move_touch) {
+                    int distance = (touch_pos - event.getY()) < 0 ? (int) (touch_pos - event.getY()) * -1 : (int) (touch_pos - event.getY());
+                    if (distance > 100) {
+                        if (touch_pos > (int) event.getY()) {
+                            if (player.canMove(Player.TDirection.NORTH))
+                                player.moveUp();
+                        } else {
+                            if (player.canMove(Player.TDirection.SOUTH))
+                                player.moveDown();
+                        }
+                    } else
+                        player.stop();
+                    move_touch = false;
+                    touch = true;
+                } else
+                    player.stop();
+                touching = false;
+            }
         return true;
     }
-
 }
