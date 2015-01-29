@@ -79,13 +79,15 @@ public class GameView extends SurfaceView {
                 Log.d("ESTADO?", " " + gameLoopThread.getState());
 
                 try {
+                    gameLoopThread.setRunning(true);
                     gameLoopThread.start();
                 } catch (IllegalThreadStateException e){
                     gameLoopThread = null;
                     gameLoopThread = new GameLoopThread(GameView.this);
+                    gameLoopThread.setRunning(true);
                     gameLoopThread.start();
                 }
-                gameLoopThread.setRunning(true);
+
 
                 Log.d("ESTADO?", " " + gameLoopThread.getState());
             }
@@ -209,7 +211,7 @@ public class GameView extends SurfaceView {
             }
         }
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                Log.d("Soltado", "spoltado");
+                Log.d("Soltado", "soltado");
                 if (move_touch) {
                     int distance = (touch_pos - event.getY()) < 0 ? (int) (touch_pos - event.getY()) * -1 : (int) (touch_pos - event.getY());
                     if (distance > 100) {
