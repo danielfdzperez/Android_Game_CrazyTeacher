@@ -40,6 +40,7 @@ public class GameView extends SurfaceView {
     private Arrow[] arrows;
 
     private Player player;
+    private Enemy enemy;
 
 
     public GameView(Context context) {
@@ -74,6 +75,7 @@ public class GameView extends SurfaceView {
                 edit_width = width;
                 loadMap();
                 loadPlayer();
+                loadEnemy();
                 loadArrows();
 
                 Log.d("ESTADO?", " " + gameLoopThread.getState());
@@ -144,6 +146,17 @@ public class GameView extends SurfaceView {
                 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
     }
 
+    public void loadEnemy(){
+        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.teacher);
+
+        int img_width = (player_img.getWidth()/3) < width ? width : (player_img.getWidth()/3);
+        int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
+        int player_row = (player_img.getHeight()/4) > height ? ((0)*(height)) :  ((0)*(height-6));
+        int player_col = width;
+        enemy = new Enemy(player_col, player_row, img_width, img_height, player_img, (player_img.getWidth()/3), (player_img.getHeight()/4), 2, 3, 0, 0, (edit_height * 2),
+                0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
+    }
+
     public void loadArrows(){
         Bitmap arrow_right_img = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_right);
         Bitmap arrow_left_img  = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_left);
@@ -154,6 +167,7 @@ public class GameView extends SurfaceView {
 
     public void updateObjects(){
         player.update();
+        enemy.update(player);
         if(!move_touch && touch) {
             player.stop();
             touch = false;
@@ -175,6 +189,10 @@ public class GameView extends SurfaceView {
                 if( (((int)((player.getPosition().getY()+player.getSprite().getHeight())/edit_height)) == y) && ((int)((player.getPosition().getX()+player.getSprite().getWidth())/(edit_width)) == x)) {
                     player.getSprite().nextAnimation();
                     player.onDraw(canvas);
+                }
+                if( (((int)((enemy.getPosition().getY()+enemy.getSprite().getHeight())/edit_height)) == y) && ((int)((enemy.getPosition().getX()+enemy.getSprite().getWidth())/(edit_width)) == x)) {
+                    enemy.getSprite().nextAnimation();
+                    enemy.onDraw(canvas);
                 }
             }
 

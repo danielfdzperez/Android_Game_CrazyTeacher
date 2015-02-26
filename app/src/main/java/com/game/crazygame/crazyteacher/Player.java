@@ -1,7 +1,6 @@
 package com.game.crazygame.crazyteacher;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 /**
  * Created by pc02 on 21/01/15.
