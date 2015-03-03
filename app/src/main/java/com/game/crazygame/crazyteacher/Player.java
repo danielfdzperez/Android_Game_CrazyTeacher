@@ -3,7 +3,7 @@ package com.game.crazygame.crazyteacher;
 import android.graphics.Bitmap;
 
 /**
- * Created by pc02 on 21/01/15.
+ * Created by Danielfdzperez on 21/01/15.
  */
 
 
@@ -43,6 +43,14 @@ public class Player extends GameObject{
         return moving;
     }
 
+    public int getX_movement() {
+        return x_movement;
+    }
+
+    public void setX_movement(int x_movement) {
+        this.x_movement = x_movement;
+    }
+
     public void moveRight(){
         this.getSpeed().setX(x_movement);
         this.getSprite().setDirection(2);
@@ -71,7 +79,7 @@ public class Player extends GameObject{
         this.getSpeed().setX(0);
         this.getSpeed().setY(0);
         this.getSprite().setDirection(3);
-        this.getSprite().setCurrent_animation(0);
+        this.getSprite().setCurrent_animation(1);
         this.direction = TDirection.NORTH;
         this.moving = false;
     }

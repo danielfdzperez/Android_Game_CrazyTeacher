@@ -3,7 +3,7 @@ package com.game.crazygame.crazyteacher;
 import android.graphics.Bitmap;
 
 /**
- * Created by pc02 on 19/01/15.
+ * Created by danielfdzperez on 19/01/15.
  */
 public class Sprite {
     private Bitmap bmp;

@@ -1,7 +1,7 @@
 package com.game.crazygame.crazyteacher;
 
 /**
- * Created by pc02 on 20/01/15.
+ * Created by Danielfdzperez on 20/01/15.
  */
 
 
@@ -187,11 +187,11 @@ public class GameView extends SurfaceView {
             for(int x=0; x<COLS; x++) {
                 this.map[y][x].onDraw(canvas, x, y, width, height);
                 if( (((int)((player.getPosition().getY()+player.getSprite().getHeight())/edit_height)) == y) && ((int)((player.getPosition().getX()+player.getSprite().getWidth())/(edit_width)) == x)) {
-                    player.getSprite().nextAnimation();
+                    //player.getSprite().nextAnimation();
                     player.onDraw(canvas);
                 }
                 if( (((int)((enemy.getPosition().getY()+enemy.getSprite().getHeight())/edit_height)) == y) && ((int)((enemy.getPosition().getX()+enemy.getSprite().getWidth())/(edit_width)) == x)) {
-                    enemy.getSprite().nextAnimation();
+                    //enemy.getSprite().nextAnimation();
                     enemy.onDraw(canvas);
                 }
             }

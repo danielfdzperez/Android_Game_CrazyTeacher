@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 /**
- * Created by pc02 on 22/01/15.
+ * Created by Danielfdzperez on 22/01/15.
  */
 public class Arrow {
     private Rect detector;

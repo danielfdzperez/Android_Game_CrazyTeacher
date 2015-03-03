@@ -3,7 +3,9 @@ package com.game.crazygame.crazyteacher;
 import android.graphics.Canvas;
 import android.util.Log;
 
-
+/**
+ * Created by Danielfdzperez on 22/01/15.
+ */
 public class GameLoopThread extends Thread {
 
     static final long FPS = 10;
