@@ -15,6 +15,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
@@ -23,10 +26,11 @@ public class GameView extends SurfaceView {
 
     static final int ROWS = 15;
     static final int COLS = 12;
+    static final int MAX_SHOES = 20;
 
     private SurfaceHolder holder;
     private GameLoopThread gameLoopThread;
-    private Tile[][] map = new Tile[ROWS][COLS];//TODO Inicializar en su sitio
+    private Tile[][] map;
     private int height;
     private int width;
     private boolean big_screen_Y;
@@ -34,13 +38,14 @@ public class GameView extends SurfaceView {
     private int edit_width;
     private int edit_height;
     private static int touch_pos;//Guarda la posicion y de la pulsacion anterior
-    private static boolean move_touch = false;//Esta haciendo un scroll
-    private boolean touch = false;//TODO inicializar en su sitio
-    private boolean touching = false;//TODO inicializar en su sitio
+    private static boolean move_touch;//Esta haciendo un scroll
+    private boolean touch;
+    private boolean touching;
     private Arrow[] arrows;
 
     private Player player;
     private Enemy enemy;
+    private ArrayList<Shoe> shoes;
 
 
     public GameView(Context context) {
@@ -73,10 +78,12 @@ public class GameView extends SurfaceView {
                 width =  (int)Math.round((getWidth()*1.0)/COLS);
                 edit_height = height;
                 edit_width = width;
+                initializeVariables();
                 loadMap();
                 loadPlayer();
                 loadEnemy();
                 loadArrows();
+
 
                 Log.d("ESTADO?", " " + gameLoopThread.getState());
 
@@ -104,6 +111,14 @@ public class GameView extends SurfaceView {
 
     }
 
+    private void initializeVariables(){
+        this.map = new Tile[ROWS][COLS];
+        this.move_touch = false;
+        this.touch = false;
+        this.touching = false;
+        this.shoes = new ArrayList(MAX_SHOES);
+    }
+
     private void loadMap(){
         Bitmap img_ground = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
         Bitmap img_table  = BitmapFactory.decodeResource(getResources(), R.drawable.table);
@@ -128,7 +143,6 @@ public class GameView extends SurfaceView {
 
     private void loadPlayer(){
         Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.bad2);
-
 
         //TODO Cambiar esto
         if((player_img.getHeight()/4) < height) {
@@ -165,12 +179,34 @@ public class GameView extends SurfaceView {
         arrows[1] = new Arrow (getWidth() - (arrow_right_img.getWidth()), getHeight()-(arrow_right_img.getHeight()*2), arrow_right_img);
     }
 
+    public void addShoe(){
+        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.teacher);
+
+        //TODO cambiar width / 8, height / 1
+        int img_width = (player_img.getWidth()/3) < width ? width : (player_img.getWidth()/3);
+        int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
+        this.shoes.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/3), (player_img.getHeight()/4), 2, 3, 0, 0, (edit_height * 2),
+                0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height)));
+    };
+
     public void updateObjects(){
         player.update();
         enemy.update(player);
         if(!move_touch && touch) {
             player.stop();
             touch = false;
+        }
+        if(this.enemy.has_to_shoot())
+            addShoe();
+        for(int i = 0; i< this.shoes.size(); i++){
+            if(this.shoes.get(i).screenOut((this.edit_height * ROWS)))
+                this.shoes.remove(i);
+            else
+                if(this.shoes.get(i).collision(this.player)) {
+                    Log.d("IMPACTO", "MUERTOOOOOOOOOOO" + gameLoopThread.getState());
+                }
+            else
+                    this.shoes.get(i).update();
         }
     }
 
@@ -195,6 +231,9 @@ public class GameView extends SurfaceView {
                     enemy.onDraw(canvas);
                 }
             }
+        for(int i = 0; i< this.shoes.size(); i++) {
+            this.shoes.get(i).onDraw(canvas);
+        }
 
         for(int x = 0; x<arrows.length; x++){
             arrows[x].onDraw(canvas);

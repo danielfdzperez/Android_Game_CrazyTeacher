@@ -35,6 +35,14 @@ public class Player extends GameObject{
         this.y_max_margin = y_max_margin;
     }
 
+    public int getY_movement() {
+        return y_movement;
+    }
+
+    public void setY_movement(int y_movement) {
+        this.y_movement = y_movement;
+    }
+
     public void setMoving(boolean moving) {
         this.moving = moving;
     }

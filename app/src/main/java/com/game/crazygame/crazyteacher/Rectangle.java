@@ -33,6 +33,12 @@ public class Rectangle {
         this.position.setY(y);
     }
 
+    public void set(int x,int y,int width, int height){
+        setPosition(x,y);
+        setHeight(height);
+        setWidth(width);
+    }
+
     public int getHeight() {
         return height;
     }
@@ -46,7 +52,7 @@ public class Rectangle {
      * @param rectangle
      * @return boolean
      */
-    public boolean Collision(Rectangle rectangle){
+    public boolean collision(Rectangle rectangle){
         return (this.position.getX() <  rectangle.position.getX() + rectangle.getWidth() &&
                 this.position.getX() + this.width > rectangle.position.getX() &&
                 this.position.getY() < rectangle.position.getY() + rectangle.getHeight()&&

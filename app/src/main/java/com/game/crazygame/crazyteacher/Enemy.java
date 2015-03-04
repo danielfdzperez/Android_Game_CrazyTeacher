@@ -16,15 +16,10 @@ public class Enemy extends Player{
                  int x_min_margin, int x_max_margin, int y_min_margin, int y_max_margin){
         super(x, y, width, height, bmp, image_width, image_height, animation, direction, speed_x, speed_y, y_movement, x_min_margin, x_max_margin, y_min_margin, y_max_margin);
 
-        this.time_shoot = 15;
+        this.time_shoot = 30;
         this.current_time_shoot = 1;
         this.max_speed = 30;
         this.setX_movement(2);
-    }
-
-
-    public void shoot(){
-
     }
 
     @Override
@@ -47,7 +42,7 @@ public class Enemy extends Player{
                 this.stop();
     }
 
-    private boolean has_to_shoot(){
+    public boolean has_to_shoot(){
         boolean shoot = false;
         if(current_time_shoot % time_shoot == 0){
             current_time_shoot = 1;
@@ -65,8 +60,6 @@ public class Enemy extends Player{
 
     public void update(Player player){
         this.move(player);
-        if(this.has_to_shoot())
-            this.shoot();
         super.update();
     }
 }

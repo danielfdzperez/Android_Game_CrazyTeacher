@@ -26,6 +26,22 @@ public class GameObject {
         this.speed = new Point(speedX, speedY);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public Sprite getSprite() {
         return this.sprite;
     }
@@ -53,5 +69,9 @@ public class GameObject {
         this.position.setY(this.position.getY() + this.speed.getY());
 
         this.collision_detector.set((int)this.position.getX(), (int)this.position.getY(), (int)(this.position.getX()+this.width), (int)(this.position.getY()+this.height));
+    }
+
+    public boolean collision(GameObject obj){
+        return this.collision_detector.intersect(obj.collision_detector);
     }
 }
