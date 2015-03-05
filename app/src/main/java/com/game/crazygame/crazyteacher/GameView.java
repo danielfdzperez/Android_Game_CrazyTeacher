@@ -37,12 +37,16 @@ public class GameView extends SurfaceView {
     private boolean big_screen_X;
     private int edit_width;
     private int edit_height;
-    private static int touch_pos;//Guarda la posicion y de la pulsacion anterior
+    private static int touch_pos;//Guarda la posicion de la pulsacion anterior
     private static boolean move_touch;//Esta haciendo un scroll
     private boolean touch;
-    private boolean touching;
-    private Arrow[] arrows;
+    private boolean touching; //The gamer is touching the screen.
 
+    //Game functions
+    private Arrow[] arrows;
+    private Level level;
+
+    //Game entities
     private Player player;
     private Enemy enemy;
     private ArrayList<Shoe> shoes;
@@ -79,13 +83,14 @@ public class GameView extends SurfaceView {
                 edit_height = height;
                 edit_width = width;
                 initializeVariables();
+                loadLevel();
                 loadMap();
                 loadPlayer();
                 loadEnemy();
                 loadArrows();
 
 
-                Log.d("ESTADO?", " " + gameLoopThread.getState());
+                //Log.d("ESTADO?", " " + gameLoopThread.getState());
 
                 try {
                     gameLoopThread.setRunning(true);
@@ -98,11 +103,10 @@ public class GameView extends SurfaceView {
                 }
 
 
-                Log.d("ESTADO?", " " + gameLoopThread.getState());
+                //Log.d("ESTADO?", " " + gameLoopThread.getState());
             }
 
             @Override
-
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
             }
@@ -119,6 +123,9 @@ public class GameView extends SurfaceView {
         this.shoes = new ArrayList(MAX_SHOES);
     }
 
+    private void loadLevel(){
+        this.level = new Level();
+    }
     private void loadMap(){
         Bitmap img_ground = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
         Bitmap img_table  = BitmapFactory.decodeResource(getResources(), R.drawable.table);
@@ -180,14 +187,30 @@ public class GameView extends SurfaceView {
     }
 
     public void addShoe(){
-        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.teacher);
+        //TODO Cambiar imagen
+        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.sprite_shoe);
 
         //TODO cambiar width / 8, height / 1
-        int img_width = (player_img.getWidth()/3) < width ? width : (player_img.getWidth()/3);
-        int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
-        this.shoes.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/3), (player_img.getHeight()/4), 2, 3, 0, 0, (edit_height * 2),
+        int img_width = (player_img.getWidth()/8);// < width ? width : (player_img.getWidth()/8);
+        int img_height = (player_img.getHeight());// < height ? height :  (player_img.getHeight());
+        this.shoes.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/8), (player_img.getHeight()), 7, 3, 0, 0, 16,
                 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height)));
-    };
+    }
+
+    private void enemyUpdate(){
+        if(this.enemy.has_to_shoot())
+            addShoe();
+        for(int i = 0; i< this.shoes.size(); i++){
+            if(this.shoes.get(i).screenOut((this.edit_height * ROWS)))
+                this.shoes.remove(i);
+            else
+               if(this.shoes.get(i).collision(this.player)) {
+                  Log.d("IMPACTO", "MUERTOOOOOOOOOOO" + gameLoopThread.getState());
+               }
+            else
+                this.shoes.get(i).update();
+        }
+    }
 
     public void updateObjects(){
         player.update();
@@ -196,18 +219,7 @@ public class GameView extends SurfaceView {
             player.stop();
             touch = false;
         }
-        if(this.enemy.has_to_shoot())
-            addShoe();
-        for(int i = 0; i< this.shoes.size(); i++){
-            if(this.shoes.get(i).screenOut((this.edit_height * ROWS)))
-                this.shoes.remove(i);
-            else
-                if(this.shoes.get(i).collision(this.player)) {
-                    Log.d("IMPACTO", "MUERTOOOOOOOOOOO" + gameLoopThread.getState());
-                }
-            else
-                    this.shoes.get(i).update();
-        }
+        this.enemyUpdate();
     }
 
     @Override
