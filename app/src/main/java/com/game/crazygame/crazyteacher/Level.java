@@ -7,7 +7,7 @@ public class Level {
     private int current_level;
 
     public Level(Integer... current_level) {
-        this.current_level = current_level.length > 0 ? ((Integer)current_level[0]) : 0;
+        this.current_level = current_level.length > 0 ? ((Integer)current_level[0]) : 1;
     }
 
     public int getCurrent_level() {

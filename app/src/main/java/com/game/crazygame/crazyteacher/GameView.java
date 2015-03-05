@@ -10,6 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -26,7 +28,7 @@ public class GameView extends SurfaceView {
 
     static final int ROWS = 15;
     static final int COLS = 12;
-    static final int MAX_SHOES = 20;
+    static final int MAX_SHOES = 50;
 
     private SurfaceHolder holder;
     private GameLoopThread gameLoopThread;
@@ -41,6 +43,8 @@ public class GameView extends SurfaceView {
     private static boolean move_touch;//Esta haciendo un scroll
     private boolean touch;
     private boolean touching; //The gamer is touching the screen.
+    private int dodged_shoe;
+    private int shoes_to_next_level;
 
     //Game functions
     private Arrow[] arrows;
@@ -49,7 +53,7 @@ public class GameView extends SurfaceView {
     //Game entities
     private Player player;
     private Enemy enemy;
-    private ArrayList<Shoe> shoes;
+    private ArrayList<Shoe> shoe;
 
 
     public GameView(Context context) {
@@ -120,7 +124,9 @@ public class GameView extends SurfaceView {
         this.move_touch = false;
         this.touch = false;
         this.touching = false;
-        this.shoes = new ArrayList(MAX_SHOES);
+        this.shoe = new ArrayList(MAX_SHOES);
+        this.dodged_shoe = 0;
+        this.shoes_to_next_level = 10;
     }
 
     private void loadLevel(){
@@ -149,7 +155,7 @@ public class GameView extends SurfaceView {
     }
 
     private void loadPlayer(){
-        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.bad2);
+        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.student);
 
         //TODO Cambiar esto
         if((player_img.getHeight()/4) < height) {
@@ -168,7 +174,15 @@ public class GameView extends SurfaceView {
     }
 
     public void loadEnemy(){
-        Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.teacher);
+        Bitmap player_img = null;
+        int image_number = 0 + (int)(Math.random() * ((1 - 0) + 1));
+        switch (image_number) {
+            case 0: player_img = BitmapFactory.decodeResource(getResources(), R.drawable.teacher);
+                break;
+            case 1:
+                player_img = BitmapFactory.decodeResource(getResources(), R.drawable.teacher2);
+                break;
+        };
 
         int img_width = (player_img.getWidth()/3) < width ? width : (player_img.getWidth()/3);
         int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
@@ -193,23 +207,39 @@ public class GameView extends SurfaceView {
         //TODO cambiar width / 8, height / 1
         int img_width = (player_img.getWidth()/8);// < width ? width : (player_img.getWidth()/8);
         int img_height = (player_img.getHeight());// < height ? height :  (player_img.getHeight());
-        this.shoes.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/8), (player_img.getHeight()), 7, 3, 0, 0, 16,
+        this.shoe.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/8), (player_img.getHeight()), 7, 3, 0, 0, 16,
                 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height)));
     }
 
-    private void enemyUpdate(){
+    private void shoeUpdate(){
         if(this.enemy.has_to_shoot())
             addShoe();
-        for(int i = 0; i< this.shoes.size(); i++){
-            if(this.shoes.get(i).screenOut((this.edit_height * ROWS)))
-                this.shoes.remove(i);
+        for(int i = 0; i< this.shoe.size(); i++){
+            if(this.shoe.get(i).screenOut((this.edit_height * ROWS))) {
+                this.shoe.remove(i);
+                this.dodged_shoe ++;
+                Log.d("Zapato Muerto", " ");
+            }
             else
-               if(this.shoes.get(i).collision(this.player)) {
-                  Log.d("IMPACTO", "MUERTOOOOOOOOOOO" + gameLoopThread.getState());
+               if(this.shoe.get(i).collision(this.player)) {
+                  Log.d("IMPACTO", "MUERTOOOOOOOOOOO");
                }
             else
-                this.shoes.get(i).update();
+                this.shoe.get(i).update();
         }
+    }
+
+    private void levelUp(){
+        enemy.change_speed(this.level.getCurrent_level()+1);
+        if(enemy.getTime_shoot() > 5)
+            enemy.setTime_shoot(enemy.getTime_shoot() - 5);
+        this.level.nextLevel();
+        this.dodged_shoe = 0;
+        if(this.shoes_to_next_level + 5 < MAX_SHOES)
+           this.shoes_to_next_level += 5;
+
+        Log.d("NIVEL", "DISPARO: " + this.enemy.getTime_shoot());
+        Log.d("NIVEL", "LEVEL: " + this.level.getCurrent_level());
     }
 
     public void updateObjects(){
@@ -219,17 +249,21 @@ public class GameView extends SurfaceView {
             player.stop();
             touch = false;
         }
-        this.enemyUpdate();
+        this.shoeUpdate();
+        if(this.dodged_shoe >= this.shoes_to_next_level)
+            levelUp();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
         canvas.drawColor(Color.BLACK);
+
         for(int y=0; y<ROWS; y++)
             for(int x=0; x<COLS; x++) {
                 this.map[0][0].onDraw(canvas, x, y, width, height);
             }
+
 
         for(int y=0; y<ROWS; y++)
             for(int x=0; x<COLS; x++) {
@@ -243,13 +277,25 @@ public class GameView extends SurfaceView {
                     enemy.onDraw(canvas);
                 }
             }
-        for(int i = 0; i< this.shoes.size(); i++) {
-            this.shoes.get(i).onDraw(canvas);
+        for(int i = 0; i< this.shoe.size(); i++) {
+            this.shoe.get(i).onDraw(canvas);
         }
 
         for(int x = 0; x<arrows.length; x++){
             arrows[x].onDraw(canvas);
         }
+
+        //TODO Poner esto para que solo se cree una vez y editar level_string cuando se cambie de nivel
+        //TODO Cambiar nombre variables
+        String level_text = "lvl: " + this.level.getCurrent_level();
+        Paint paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintText.setColor(Color.WHITE);
+        paintText.setTextSize(16);
+        paintText.setStyle(Paint.Style.FILL);
+        paintText.setShadowLayer(10f, 10f, 10f, Color.BLACK);
+        Rect rectText = new Rect();
+        paintText.getTextBounds(level_text, 0, level_text.length(), rectText);
+        canvas.drawText(level_text,(this.getWidth() - rectText.width())-5, rectText.height()+2, paintText);
     }
 
     //@Override

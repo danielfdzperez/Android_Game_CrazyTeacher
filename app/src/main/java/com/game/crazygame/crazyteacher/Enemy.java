@@ -18,8 +18,24 @@ public class Enemy extends Player{
 
         this.time_shoot = 30;
         this.current_time_shoot = 1;
-        this.max_speed = 30;
+        this.max_speed = 10;
         this.setX_movement(2);
+    }
+
+    public int getCurrent_time_shoot() {
+        return current_time_shoot;
+    }
+
+    public void setCurrent_time_shoot(int current_time_shoot) {
+        this.current_time_shoot = current_time_shoot;
+    }
+
+    public int getTime_shoot() {
+        return time_shoot;
+    }
+
+    public void setTime_shoot(int time_shoot) {
+        this.time_shoot = time_shoot;
     }
 
     @Override

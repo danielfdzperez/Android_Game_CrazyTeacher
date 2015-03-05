@@ -9,6 +9,7 @@ import android.util.Log;
 public class GameLoopThread extends Thread {
 
     static final long FPS = 10;
+    static final long SECOND = 1000;
 
     private GameView view;
 
@@ -35,7 +36,7 @@ public class GameLoopThread extends Thread {
 
     public void run() {
 
-        long ticksPS = 1000 / FPS;
+        long ticksPS = SECOND / FPS;
 
         long startTime;
 
