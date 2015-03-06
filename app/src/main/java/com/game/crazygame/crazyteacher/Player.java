@@ -17,6 +17,10 @@ public class Player extends GameObject{
     private int y_movement;
     private TDirection direction;
 
+    private Point initial_position;
+    private TDirection initial_direction;
+    private int initial_sprite_direction;
+
     private int x_min_margin;
     private int x_max_margin;
     private int y_min_margin;
@@ -25,10 +29,12 @@ public class Player extends GameObject{
     public Player(float x, float y, int width, int height, Bitmap bmp, int image_width, int image_height, int animation, int direction, float speed_x, float speed_y, int y_movement,
                   int x_min_margin, int x_max_margin, int y_min_margin, int y_max_margin){
         super(x, y, width, height, bmp, image_width, image_height, animation, direction, speed_x, speed_y);
+        this.initial_position = new Point(x,y);
         this.moving = false;
         this.x_movement = 10;
         this.y_movement = y_movement;
-        this.direction = Player.TDirection.NORTH;
+        this.initial_sprite_direction = direction;
+        this.initial_direction = this.direction = Player.TDirection.NORTH;
         this.x_min_margin = x_min_margin;
         this.x_max_margin = x_max_margin;
         this.y_min_margin = y_min_margin;
@@ -90,6 +96,14 @@ public class Player extends GameObject{
         this.getSprite().setCurrent_animation(1);
         this.direction = TDirection.NORTH;
         this.moving = false;
+    }
+
+    public void restart(){
+        this.getPosition().setX(this.initial_position.getX());
+        this.getPosition().setY(this.initial_position.getY());
+        this.direction = this.initial_direction;
+        this.moving = false;
+        this.getSprite().setDirection(this.initial_sprite_direction);
     }
 
     public void setDirection(TDirection direction) {

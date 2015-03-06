@@ -23,6 +23,6 @@ public class Level {
     }
 
     public void restartLevel(){
-        this.current_level = 0;
+        this.current_level = 1;
     }
 }

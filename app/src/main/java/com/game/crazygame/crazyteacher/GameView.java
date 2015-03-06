@@ -12,16 +12,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
-import android.widget.Toast;
-
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-
-import static java.lang.Thread.sleep;
 
 /*TODO Cambiar las variables height y width para que funcione bien sin repetir tanto codigo*/
 public class GameView extends SurfaceView {
@@ -29,6 +27,7 @@ public class GameView extends SurfaceView {
     static final int ROWS = 15;
     static final int COLS = 12;
     static final int MAX_SHOES = 50;
+    static final int MIN_SHOES = 10;
 
     private SurfaceHolder holder;
     private GameLoopThread gameLoopThread;
@@ -45,6 +44,10 @@ public class GameView extends SurfaceView {
     private boolean touching; //The gamer is touching the screen.
     private int dodged_shoe;
     private int shoes_to_next_level;
+    private FragmentManager fragment_manager;
+
+    //Player puntuation
+    private float player_puntuation;
 
     //Game functions
     private Arrow[] arrows;
@@ -126,7 +129,8 @@ public class GameView extends SurfaceView {
         this.touching = false;
         this.shoe = new ArrayList(MAX_SHOES);
         this.dodged_shoe = 0;
-        this.shoes_to_next_level = 10;
+        this.shoes_to_next_level = MIN_SHOES;
+        this.player_puntuation = 0;
     }
 
     private void loadLevel(){
@@ -173,7 +177,7 @@ public class GameView extends SurfaceView {
                 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
     }
 
-    public void loadEnemy(){
+    private void loadEnemy(){
         Bitmap player_img = null;
         int image_number = 0 + (int)(Math.random() * ((1 - 0) + 1));
         switch (image_number) {
@@ -192,7 +196,7 @@ public class GameView extends SurfaceView {
                 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
     }
 
-    public void loadArrows(){
+    private void loadArrows(){
         Bitmap arrow_right_img = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_right);
         Bitmap arrow_left_img  = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_left);
         arrows = new Arrow[2];
@@ -200,7 +204,17 @@ public class GameView extends SurfaceView {
         arrows[1] = new Arrow (getWidth() - (arrow_right_img.getWidth()), getHeight()-(arrow_right_img.getHeight()*2), arrow_right_img);
     }
 
-    public void addShoe(){
+    private void restart(){
+        this.shoe.clear();
+        this.player_puntuation = 0;
+        this.dodged_shoe = 0;
+        this.shoes_to_next_level = MIN_SHOES;
+        this.level.restartLevel();
+        this.player.restart();
+        this.enemy.restart();
+    }
+
+    private void addShoe(){
         //TODO Cambiar imagen
         Bitmap player_img = BitmapFactory.decodeResource(getResources(), R.drawable.sprite_shoe);
 
@@ -217,12 +231,17 @@ public class GameView extends SurfaceView {
         for(int i = 0; i< this.shoe.size(); i++){
             if(this.shoe.get(i).screenOut((this.edit_height * ROWS))) {
                 this.shoe.remove(i);
+                this.player_puntuation +=  ( 3/(this.player.getPosition().getY()/edit_height) ) *level.getCurrent_level();
                 this.dodged_shoe ++;
                 Log.d("Zapato Muerto", " ");
             }
             else
                if(this.shoe.get(i).collision(this.player)) {
-                  Log.d("IMPACTO", "MUERTOOOOOOOOOOO");
+                   //this.shoe.remove(i);
+                   this.restart();
+                   //Toast toast1 = Toast.makeText(this.getContext().getApplicationContext(),"Muerto", Toast.LENGTH_SHORT);
+                   //toast1.show();
+                  //Log.d("IMPACTO", "MUERTOOOOOOOOOOO");
                }
             else
                 this.shoe.get(i).update();
@@ -288,14 +307,21 @@ public class GameView extends SurfaceView {
         //TODO Poner esto para que solo se cree una vez y editar level_string cuando se cambie de nivel
         //TODO Cambiar nombre variables
         String level_text = "lvl: " + this.level.getCurrent_level();
+        DecimalFormat decimal_format = new DecimalFormat("#.##");
+        String puntuation_text = "Points: " + decimal_format.format(this.player_puntuation);
         Paint paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintText.setColor(Color.WHITE);
-        paintText.setTextSize(16);
+        if(big_screen_Y)
+            paintText.setTextSize(40);
+        else
+           paintText.setTextSize(16);
         paintText.setStyle(Paint.Style.FILL);
         paintText.setShadowLayer(10f, 10f, 10f, Color.BLACK);
         Rect rectText = new Rect();
         paintText.getTextBounds(level_text, 0, level_text.length(), rectText);
         canvas.drawText(level_text,(this.getWidth() - rectText.width())-5, rectText.height()+2, paintText);
+        paintText.getTextBounds(puntuation_text, 0, puntuation_text.length(), rectText);
+        canvas.drawText(puntuation_text,(this.getWidth() - rectText.width())-5, (rectText.height()+2)*2, paintText);
     }
 
     //@Override
