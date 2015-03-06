@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v4.app.FragmentManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -44,7 +45,6 @@ public class GameView extends SurfaceView {
     private boolean touching; //The gamer is touching the screen.
     private int dodged_shoe;
     private int shoes_to_next_level;
-    private FragmentManager fragment_manager;
 
     //Player puntuation
     private float player_puntuation;
@@ -87,6 +87,10 @@ public class GameView extends SurfaceView {
             public void surfaceCreated(SurfaceHolder holder) {
                 height = (int)Math.round((getHeight()*1.0)/ROWS);
                 width =  (int)Math.round((getWidth()*1.0)/COLS);
+
+                //TODO Usar esto para conocer la densidad de pixel y evitar usar el edit_with y height
+                //Ver http://infinut.com/2013/10/10/to-opengl-or-to-surfaceview/
+                DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
                 edit_height = height;
                 edit_width = width;
                 initializeVariables();
