@@ -216,6 +216,9 @@ public class GameView extends SurfaceView {
         this.level.restartLevel();
         this.player.restart();
         this.enemy.restart();
+        this.move_touch = false;
+        this.touch = false;
+        this.touching = false;
     }
 
     private void addShoe(){
@@ -232,12 +235,13 @@ public class GameView extends SurfaceView {
     private void shoeUpdate(){
         if(this.enemy.has_to_shoot())
             addShoe();
-        for(int i = 0; i< this.shoe.size(); i++){
+        for(int i = 0; i < this.shoe.size(); i++){
             if(this.shoe.get(i).screenOut((this.edit_height * ROWS))) {
                 this.shoe.remove(i);
                 this.player_puntuation +=  ( 3/(this.player.getPosition().getY()/edit_height) ) *level.getCurrent_level();
                 this.dodged_shoe ++;
-                Log.d("Zapato Muerto", " ");
+                i --;
+                //Log.d("Zapato Muerto", " ");
             }
             else
                if(this.shoe.get(i).collision(this.player)) {
@@ -254,7 +258,7 @@ public class GameView extends SurfaceView {
 
     private void levelUp(){
         enemy.change_speed(this.level.getCurrent_level()+1);
-        if(enemy.getTime_shoot() > 5)
+        if(enemy.getTime_shoot() > 10)
             enemy.setTime_shoot(enemy.getTime_shoot() - 5);
         this.level.nextLevel();
         this.dodged_shoe = 0;

@@ -78,6 +78,11 @@ public class Enemy extends Player{
         this.move(player);
         super.update();
     }
+    public void restart(){
+        this.time_shoot = 30;
+        this.current_time_shoot = 1;
+        super.restart();
+    }
 }
 
 

@@ -101,8 +101,9 @@ public class Player extends GameObject{
     public void restart(){
         this.getPosition().setX(this.initial_position.getX());
         this.getPosition().setY(this.initial_position.getY());
-        this.direction = this.initial_direction;
-        this.moving = false;
+        //this.direction = this.initial_direction;
+        //this.moving = false;
+        this.stop();
         this.getSprite().setDirection(this.initial_sprite_direction);
     }
 
