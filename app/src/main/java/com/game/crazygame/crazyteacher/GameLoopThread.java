@@ -59,7 +59,7 @@ public class GameLoopThread extends Thread {
 
                 synchronized (view.getHolder()) {
                     view.updateObjects();
-                    view.onDraw(c);
+                    view.Draw(c);
 
                 }
 

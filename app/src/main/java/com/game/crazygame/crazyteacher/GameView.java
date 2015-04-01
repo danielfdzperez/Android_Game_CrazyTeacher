@@ -177,8 +177,9 @@ public class GameView extends SurfaceView {
         int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
         int player_row = (player_img.getHeight()/4) > height ? ((ROWS-2)*(height)) :  ((ROWS-2)*(height-6));
         int player_col = 10;
+        int player_x_movement = big_screen_Y ? 20 : 10;
         player = new Player(player_col, player_row, img_width, img_height, player_img, (player_img.getWidth()/3), (player_img.getHeight()/4), 2, 3, 0, 0, (edit_height * 2),
-                0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
+                player_x_movement, 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
     }
 
     private void loadEnemy(){
@@ -196,8 +197,9 @@ public class GameView extends SurfaceView {
         int img_height = (player_img.getHeight()/4) < height ? height :  (player_img.getHeight()/4);
         int player_row = (player_img.getHeight()/4) > height ? ((0)*(height)) :  ((0)*(height-6));
         int player_col = width;
+        int enemy_x_movement = big_screen_Y ? 20 : 10;
         enemy = new Enemy(player_col, player_row, img_width, img_height, player_img, (player_img.getWidth()/3), (player_img.getHeight()/4), 2, 3, 0, 0, (edit_height * 2),
-                0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height));
+                enemy_x_movement, 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height), enemy_x_movement);
     }
 
     private void loadArrows(){
@@ -228,7 +230,8 @@ public class GameView extends SurfaceView {
         //TODO cambiar width / 8, height / 1
         int img_width = (player_img.getWidth()/8);// < width ? width : (player_img.getWidth()/8);
         int img_height = (player_img.getHeight());// < height ? height :  (player_img.getHeight());
-        this.shoe.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/8), (player_img.getHeight()), 7, 3, 0, 0, 16,
+        int y_movement = big_screen_Y ? 70 : 16;
+        this.shoe.add(new Shoe(this.enemy.getPosition().getX(), this.enemy.getPosition().getY(), img_width, img_height, player_img, (player_img.getWidth()/8), (player_img.getHeight()), 7, 3, 0, 0, y_movement,
                 0, (getWidth() - edit_width), (edit_height * 2), (getHeight()-edit_height)));
     }
 
@@ -281,8 +284,8 @@ public class GameView extends SurfaceView {
             levelUp();
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
+
+    protected void Draw(Canvas canvas) {
 
         canvas.drawColor(Color.BLACK);
 

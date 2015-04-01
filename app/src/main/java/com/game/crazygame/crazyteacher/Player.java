@@ -27,11 +27,11 @@ public class Player extends GameObject{
     private int y_max_margin;
 
     public Player(float x, float y, int width, int height, Bitmap bmp, int image_width, int image_height, int animation, int direction, float speed_x, float speed_y, int y_movement,
-                  int x_min_margin, int x_max_margin, int y_min_margin, int y_max_margin){
+                  int x_movement, int x_min_margin, int x_max_margin, int y_min_margin, int y_max_margin){
         super(x, y, width, height, bmp, image_width, image_height, animation, direction, speed_x, speed_y);
         this.initial_position = new Point(x,y);
         this.moving = false;
-        this.x_movement = 10;
+        this.x_movement = x_movement;
         this.y_movement = y_movement;
         this.initial_sprite_direction = direction;
         this.initial_direction = this.direction = Player.TDirection.NORTH;

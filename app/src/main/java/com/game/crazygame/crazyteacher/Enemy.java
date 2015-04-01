@@ -13,12 +13,12 @@ public class Enemy extends Player{
     private int max_speed;
 
     public Enemy(float x, float y, int width, int height, Bitmap bmp, int image_width, int image_height, int animation, int direction, float speed_x, float speed_y, int y_movement,
-                 int x_min_margin, int x_max_margin, int y_min_margin, int y_max_margin){
-        super(x, y, width, height, bmp, image_width, image_height, animation, direction, speed_x, speed_y, y_movement, x_min_margin, x_max_margin, y_min_margin, y_max_margin);
+                 int x_movement, int x_min_margin, int x_max_margin, int y_min_margin, int y_max_margin, int max_speed){
+        super(x, y, width, height, bmp, image_width, image_height, animation, direction, speed_x, speed_y, y_movement, x_movement ,x_min_margin, x_max_margin, y_min_margin, y_max_margin);
 
         this.time_shoot = 30;
         this.current_time_shoot = 1;
-        this.max_speed = 10;
+        this.max_speed = max_speed;
         this.setX_movement(2);
     }
 
